@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Typography } from "@material-ui/core";
+import WorkspaceBox from "./WorkspaceBox";
 import createUuid from "uuid-v4";
 
 const preventDefault = event => event.preventDefault();
@@ -58,23 +59,13 @@ function DrawBox( { box } ) {
     return <div style={ style } />;
 }
 
-function WorkspaceBox({ box }) {
-    //TODO fix box overflow by clipping
-    const { top, left, width, height } = box;
-    const style = {
-        top,
-        left,
-        width,
-        height,
-        position: "absolute",
-        backgroundColor: "#ccc",
-        borderRadius: "2px",
-        boxSizing: "border-box"
-    };
-    return <div style={ style } />;
+function replaceBox(boxes = [], newBox) {
+    return boxes.map(box => {
+        return box.id === newBox.id ? newBox : box;
+    });
 }
 
-function Workspace({ style, value, onChange }) {
+function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
 
     const [ drawBoxState, setDrawBoxState ] = useState(undefined);
     const containerRef = useRef(null);
@@ -85,7 +76,7 @@ function Workspace({ style, value, onChange }) {
                 startX: drawStartEvent.clientX,
                 startY: drawStartEvent.clientY,
                 endX: drawStartEvent.clientX,
-                endY: drawStartEvent.clientY,
+                endY: drawStartEvent.clientY
             });
         }
     }
@@ -104,22 +95,35 @@ function Workspace({ style, value, onChange }) {
     }
 
     function handleDrawEnd() {
-        const { startX, startY, endX, endY } = drawBoxState;
-        const newBox = {
-            id: createUuid(),
-            left: Math.min(startX, endX),
-            top: Math.min(startY, endY),
-            width: Math.abs(startX - endX),
-            height: Math.abs(startY - endY)
-        };
-        //TODO this feels like a reducer job
+        if (drawBoxState) {
+            const { startX, startY, endX, endY } = drawBoxState;
+            const newBox = {
+                id: createUuid(),
+                left: Math.min(startX, endX),
+                top: Math.min(startY, endY),
+                width: Math.abs(startX - endX),
+                height: Math.abs(startY - endY)
+            };
+            if (newBox.width > 50 && newBox.height > 50 ) {
+                //TODO this feels like a reducer job
+                const oldBoxes = value.boxes || [];
+                const newValue = {
+                    ...value,
+                    boxes: [...oldBoxes, newBox ]
+                };
+                onSelectBox(newBox.id);
+                onChange(newValue);
+            }
+            setDrawBoxState(undefined);
+        }
+    }
+
+    function handleRemoveBox(boxToRemove) {
         const oldBoxes = value.boxes || [];
-        const newValue = {
+        onChange({
             ...value,
-            boxes: [...oldBoxes, newBox ]
-        };
-        setDrawBoxState(undefined);
-        onChange(newValue);
+            boxes: oldBoxes.filter(box => box.id !== boxToRemove.id)
+        });
     }
 
     const actualStyle = {
@@ -142,18 +146,33 @@ function Workspace({ style, value, onChange }) {
                 isEmpty && <Typography style={ { color: "#aaa", margin: "0 auto", fontSize: "200%" } }>Click and drag anywhere to add a new element to your workspace</Typography>
             }
             {
-                boxes.map(box => <WorkspaceBox box={ box } key={ box.id } />)
+                boxes.map(box =>
+                    <WorkspaceBox
+                        box={ box }
+                        key={ box.id }
+                        onRemove={ () => handleRemoveBox(box) }
+                        onSelect={ () => onSelectBox(box.id) }
+                        isSelected={ selectedBoxId === box.id }
+                    />
+                )
             }
         </div>
     );
 }
 
-export default function WorkspaceEditor({ value, onChange, style }) {
+export default function WorkspaceEditor({ value, onChange, style, }) {
     const bigStyle = { ...style, display: "flex", flexDirection: "column" };
+    const [ selectedBoxId, setSelectedBoxId ] = useState(undefined);
     return (
         <div style={ bigStyle }>
             <WorkspaceToolbar />
-            <Workspace value={ value } onChange={ onChange } style={ { flex: "1 1 0" } } />
+            <Workspace
+                value={ value }
+                onChange={ onChange }
+                onSelectBox={ setSelectedBoxId }
+                style={ { flex: "1 1 0" } }
+                selectedBoxId={ selectedBoxId }
+            />
         </div>
     );
 }

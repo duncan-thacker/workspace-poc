@@ -3,7 +3,7 @@ import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import { Typography, AppBar, Button, Toolbar } from "@material-ui/core";
 import { blue, cyan } from "@material-ui/core/colors";
 import { hot } from "react-hot-loader/root";
-import WorkspaceEditor from "../src/WorkspaceEditor.js"
+import WorkspaceEditor from "../src/WorkspaceEditor.js";
 
 const docsTheme = createMuiTheme({
     palette: {
@@ -16,18 +16,14 @@ const docsTheme = createMuiTheme({
 });
 
 function Docs() {
-    const [ workspace, setWorkspace ] = useState({});    
+    const [ workspace, setWorkspace ] = useState({});
     return (
         <MuiThemeProvider theme={ docsTheme }>
             <div style={ { display: "flex", flexDirection: "column", height: "100%" } }>
                 <AppBar position="static">
                     <Toolbar>
-                        <Typography variant="h3" color="inherit">
+                        <Typography variant="h4" color="inherit">
                         Workspaces
-                        </Typography>
-                        <Button variant="contained" color="secondary">Create New</Button>
-                        <Typography color="inherit" style={ { marginLeft: "auto" } }>
-                        Current context: PYRODOG investigation <Button color="inherit">V</Button>
                         </Typography>
                     </Toolbar>
                 </AppBar>

@@ -19,7 +19,6 @@
         }
     },
     "rules": {
-        "arrow-body-style": "error",
         "arrow-parens": ["error", "as-needed"],
         "arrow-spacing": "error",
         "brace-style": "error",
