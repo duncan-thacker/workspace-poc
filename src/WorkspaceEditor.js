@@ -1,5 +1,9 @@
 import React, { useState, useRef } from "react";
 import { Typography } from "@material-ui/core";
+import createUuid from "uuid-v4";
+
+const preventDefault = event => event.preventDefault();
+const isEventLocal = event => event.target === event.currentTarget;
 
 function clamp(valueToClamp, maxValue, snapTolerance = 0) {
     if (valueToClamp < snapTolerance) {
@@ -54,18 +58,36 @@ function DrawBox( { box } ) {
     return <div style={ style } />;
 }
 
+function WorkspaceBox({ box }) {
+    //TODO fix box overflow by clipping
+    const { top, left, width, height } = box;
+    const style = {
+        top,
+        left,
+        width,
+        height,
+        position: "absolute",
+        backgroundColor: "#ccc",
+        borderRadius: "2px",
+        boxSizing: "border-box"
+    };
+    return <div style={ style } />;
+}
+
 function Workspace({ style, value, onChange }) {
 
     const [ drawBoxState, setDrawBoxState ] = useState(undefined);
     const containerRef = useRef(null);
 
     function handleDrawStart(drawStartEvent) {
-        setDrawBoxState({
-            startX: drawStartEvent.clientX,
-            startY: drawStartEvent.clientY,
-            endX: drawStartEvent.clientX,
-            endY: drawStartEvent.clientY,
-        });
+        if (isEventLocal(drawStartEvent)) {
+            setDrawBoxState({
+                startX: drawStartEvent.clientX,
+                startY: drawStartEvent.clientY,
+                endX: drawStartEvent.clientX,
+                endY: drawStartEvent.clientY,
+            });
+        }
     }
 
     function handleMouseMove(mouseMoveEvent) {
@@ -82,8 +104,22 @@ function Workspace({ style, value, onChange }) {
     }
 
     function handleDrawEnd() {
+        const { startX, startY, endX, endY } = drawBoxState;
+        const newBox = {
+            id: createUuid(),
+            left: Math.min(startX, endX),
+            top: Math.min(startY, endY),
+            width: Math.abs(startX - endX),
+            height: Math.abs(startY - endY)
+        };
+        //TODO this feels like a reducer job
+        const oldBoxes = value.boxes || [];
+        const newValue = {
+            ...value,
+            boxes: [...oldBoxes, newBox ]
+        };
         setDrawBoxState(undefined);
-        //TODO create the box
+        onChange(newValue);
     }
 
     const actualStyle = {
@@ -94,26 +130,30 @@ function Workspace({ style, value, onChange }) {
         alignItems: "center"
     };
 
-    const isEmpty = !drawBoxState;
+    const { boxes = [] } = value;
+    const isEmpty = !drawBoxState && boxes.length === 0;
 
     return (
-        <div ref={ containerRef } style={ actualStyle } onMouseDown={ handleDrawStart } onMouseMove={ handleMouseMove } onMouseUp={ handleDrawEnd }>
+        <div onDragStart={ preventDefault } ref={ containerRef } style={ actualStyle } onMouseDown={ handleDrawStart } onMouseMove={ handleMouseMove } onMouseUp={ handleDrawEnd }>
             {
                 drawBoxState && <DrawBox box={ drawBoxState } />
             }
             {
                 isEmpty && <Typography style={ { color: "#aaa", margin: "0 auto", fontSize: "200%" } }>Click and drag anywhere to add a new element to your workspace</Typography>
             }
+            {
+                boxes.map(box => <WorkspaceBox box={ box } key={ box.id } />)
+            }
         </div>
     );
 }
 
-export default function WorkspaceEditor({ value, style }) {
+export default function WorkspaceEditor({ value, onChange, style }) {
     const bigStyle = { ...style, display: "flex", flexDirection: "column" };
     return (
         <div style={ bigStyle }>
             <WorkspaceToolbar />
-            <Workspace value={ value } onChange={ value } style={ { flex: "1 1 0", backgroundColor: "#ffffdd" } } />
+            <Workspace value={ value } onChange={ onChange } style={ { flex: "1 1 0" } } />
         </div>
     );
 }

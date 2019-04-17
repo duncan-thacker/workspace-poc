@@ -16,7 +16,7 @@ const docsTheme = createMuiTheme({
 });
 
 function Docs() {
-    const { workspace, setWorkspace } = useState({});
+    const [ workspace, setWorkspace ] = useState({});    
     return (
         <MuiThemeProvider theme={ docsTheme }>
             <div style={ { display: "flex", flexDirection: "column", height: "100%" } }>

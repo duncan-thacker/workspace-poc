@@ -61,7 +61,7 @@
         "no-lone-blocks": "error",
         "no-lonely-if": "error",
         "no-loop-func": "error",
-        "no-magic-numbers": ["error", { "ignore": [0, 1, 2] }],
+        "no-magic-numbers": ["warn", { "ignore": [0, 1, 2] }],
         "no-mixed-operators": "error",
         "no-multi-spaces": "error",
         "no-multiple-empty-lines": "error",
@@ -85,7 +85,7 @@
         "no-useless-call": "error",
         "no-useless-catch": "error",
         "no-useless-return": "error",
-        "no-warning-comments": "error",
+        "no-warning-comments": "warn",
         "no-with": "error",
         "prefer-promise-reject-errors": "error",
         "quotes": ["error", "double", { "avoidEscape": true }],
@@ -131,6 +131,7 @@
         "react/no-unused-prop-types": "error",
         "react/void-dom-elements-no-children": "error",
         "react/jsx-no-target-blank": "error",
+        "react/prop-types": "off",
 
         "promise/always-return": "off"
     }

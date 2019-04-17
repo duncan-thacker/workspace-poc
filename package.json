@@ -90,5 +90,8 @@
     "watchPathIgnorePatterns": [
       "/docsrc/"
     ]
+  },
+  "dependencies": {
+    "uuid-v4": "^0.1.0"
   }
 }
