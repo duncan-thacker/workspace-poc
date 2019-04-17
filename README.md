@@ -1,0 +1,1 @@
+`npm start` to spin up a demo server
