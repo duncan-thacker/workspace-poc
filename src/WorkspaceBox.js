@@ -5,6 +5,11 @@ import { HORIZONTAL_RESIZER_LEFT, HORIZONTAL_RESIZER_RIGHT, HORIZONTAL_RESIZER_N
 import TextEditor from "./TextEditor";
 import QueryPreview from "./QueryPreview";
 import { RichUtils, EditorState } from "draft-js";
+import DragHandleIcon from "@material-ui/icons/DragHandle";
+import CloseIcon from "@material-ui/icons/Close";
+import GridOnIcon from "@material-ui/icons/GridOn";
+import PlaceIcon from "@material-ui/icons/Place";
+import BarChartIcon from "@material-ui/icons/BarChart";
 
 const CONTROL_PANEL_STYLE = {
     position: "absolute",
@@ -36,14 +41,14 @@ function ControlPanel({ onRemove, box, onChangeText, onChangeView }) {
             {
                 box.type === "query" && (
                     <Tabs value={ box.query.view.type } onChange={ (event, value) => onChangeView({ type: value })} indicatorColor="primary" textColor="primary">
-                        <Tab value="spreadsheet" label="Sheet" />
-                        <Tab value="summary" label="Summary" />
-                        <Tab value="map" label="Map" />
+                        <Tab value="spreadsheet" label={ <GridOnIcon /> } />
+                        <Tab value="summary" label={ <BarChartIcon /> } />
+                        <Tab value="map" label={ <PlaceIcon /> } />
                     </Tabs>
                 )
             }
-            <Button style={ { userSelect: "none" } } onClick={ onRemove }>remove</Button>
-            <Button className='drag-handle' style={ { cursor: "move", userSelect: "none" } }>move</Button>
+            <Button className='drag-handle' style={ { cursor: "move", userSelect: "none" } }><DragHandleIcon /></Button>
+            <Button style={ { userSelect: "none" } } onClick={ onRemove }><CloseIcon /></Button>
         </Toolbar>
     );
 }

@@ -5,6 +5,14 @@ import Marker from "pigeon-marker";
 import createUuid from "uuid-v4";
 import { Typography, TextField, MenuItem } from "@material-ui/core";
 
+function useFirstRender() {
+    const [firstRender, setFirstRender] = useState(true);
+    useEffect(() => {
+        setFirstRender(false);
+    }, []);
+    return firstRender;
+}
+
 function emptyColumns(count) {
     return new Array(count).fill({});
 }
@@ -60,11 +68,8 @@ const DEFAULT_MAP_CENTER = [51.479, 0];
 const DEFAULT_MAP_ZOOM = 9;
 
 function SummaryBar({ value, count, maxCount }) {
-    const [ animate, setAnimate ] = useState(false);
-    useEffect(() => {
-        setAnimate(true);
-    }, []);
-    const barWidthPercentage = animate ? `${(count * 100 )/maxCount}%` : "0%";
+    const firstRender = useFirstRender();
+    const barWidthPercentage = firstRender ? "0%" : `${(count * 100 )/maxCount}%`;
     return (
         <div style={ { display: "flex", padding: "4px 0px", alignItems: "center" } }>
             <Typography style={ { flex: "0 0 150px", textAlign: "right" } }>{ value }</Typography>
@@ -112,9 +117,11 @@ function Summary({ rows, field = "color", onSummaryFieldChange, numberOfBars = 1
     );
 }
 
-function DataMap({ rows, ...props }) {
+function DataMap({ rows, width, ...props }) {
+    const firstRender = useFirstRender();
+    const actualWidth = firstRender ? undefined : width; //workaround weird pigeon issue
     return (
-        <Map {...props}>
+        <Map {...props} width={ actualWidth }>
             {
                 rows.map(row => <Marker key={ row.id } anchor={ row.location } />)
             }
@@ -136,12 +143,12 @@ export default function QueryPreview({ view, onChangeView, bounds }) {
         onChangeView({
             field: newSummaryField
         });
-    }
+    }    
 
     return (
         <Typography component="div">
             { view.type === "spreadsheet" && <DataGrid columns={ COLUMNS } rowGetter={ getRow } rowsCount={ 50 } minHeight={ bounds.height } enableCellSelect cellRangeSelection={{}} /> }
-            { view.type === "map" && <DataMap rows={ ROWS } center={ view.center || DEFAULT_MAP_CENTER } zoom={ view.zoom || DEFAULT_MAP_ZOOM } height={ bounds.height } onBoundsChanged={ handleMapViewChange } /> }
+            { view.type === "map" && <DataMap rows={ ROWS } center={ view.center || DEFAULT_MAP_CENTER } zoom={ view.zoom || DEFAULT_MAP_ZOOM } height={ bounds.height } width={ bounds.width } onBoundsChanged={ handleMapViewChange } /> }
             { view.type === "summary" && <Summary rows={ ROWS } field={ view.field } onSummaryFieldChange={ handleSummaryViewChange } /> }
         </Typography>
     );
