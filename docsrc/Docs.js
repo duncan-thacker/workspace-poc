@@ -39,8 +39,6 @@ function Docs() {
         });
     }
 
-    console.log(currentTabIndex, workspace.sections);
-
     return (
         <MuiThemeProvider theme={ docsTheme }>
             <div style={ { display: "flex", flexDirection: "column", height: "100%" } }>

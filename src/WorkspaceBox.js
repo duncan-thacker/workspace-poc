@@ -34,7 +34,7 @@ function ControlPanel({ onRemove, box, onChangeText, onChangeView }) {
                 box.type === "text" && <Button disabled={ !isTextHighlighted(text) } onClick={ handleBoldClick }>Bold</Button>
             }
             {
-                box.type === "query" && (                    
+                box.type === "query" && (
                     <Tabs value={ box.query.view.type } onChange={ (event, value) => onChangeView({ type: value })} indicatorColor="primary" textColor="primary">
                         <Tab value="spreadsheet" label="Sheet" />
                         <Tab value="summary" label="Summary" />
@@ -212,7 +212,7 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
                 }
             }
         });
-    }    
+    }
 
     return (
         <>

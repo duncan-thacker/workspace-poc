@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import { Typography } from "@material-ui/core";
 import WorkspaceBox from "./WorkspaceBox";
 import createUuid from "uuid-v4";
-import { EditorState } from "draft-js";
 
 const preventDefault = event => event.preventDefault();
 const isEventLocal = event => event.target === event.currentTarget;
