@@ -6,7 +6,7 @@ const { join } = require("path");
 
 module.exports = {
     entry: "./docsrc/index.js",
-    devtool: "inline-cheap-source-map",
+    devtool: "cheap-module-eval-source-map",
     output: {
         path: join(__dirname, "docs"),
         filename: "docs-bundle.js"

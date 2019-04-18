@@ -126,12 +126,28 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
         });
     }
 
+    function handleMoveBox(boxToMove, newPosition) {
+        const updatedBox = {
+            ...boxToMove,
+            ...newPosition
+        };
+        onChange({
+            ...value,
+            boxes: replaceBox(value.boxes, updatedBox)
+        });
+    }
+
+    function handleResizeBox(boxToResize, resizeEvent) {
+        console.log(boxToResize, resizeEvent);
+    }
+
     const actualStyle = {
         ...style,
         cursor: drawBoxState ? "nwse-resize" : "default",
         position: "relative",
         display: "flex",
-        alignItems: "center"
+        alignItems: "center",
+        overflow: "hidden"
     };
 
     const { boxes = [] } = value;
@@ -151,8 +167,11 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
                         box={ box }
                         key={ box.id }
                         onRemove={ () => handleRemoveBox(box) }
+                        onMove={ moveEvent => handleMoveBox(box, moveEvent ) }
                         onSelect={ () => onSelectBox(box.id) }
+                        onResize={ resizeEvent => handleResizeBox(box, resizeEvent) }
                         isSelected={ selectedBoxId === box.id }
+                        containerElement={ containerRef.current }
                     />
                 )
             }

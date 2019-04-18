@@ -92,6 +92,7 @@
     ]
   },
   "dependencies": {
+    "react-draggable": "^3.2.1",
     "uuid-v4": "^0.1.0"
   }
 }
