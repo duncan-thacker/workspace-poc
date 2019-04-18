@@ -148,7 +148,7 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
     };
 
     const { boxes = [] } = value;
-    const isEmpty = !drawBoxState && boxes.length === 0;
+    const isEmpty = boxes.length === 0;
 
     function handleBackgroundClick(clickEvent) {
         if (isEventLocal(clickEvent)) {
@@ -157,12 +157,12 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
     }
 
     return (
-        <div onDragStart={ preventDefault } ref={ containerRef } style={ actualStyle } onMouseDown={ handleDrawStart } onMouseMove={ handleMouseMove } onMouseUp={ handleDrawEnd } onClick={ handleBackgroundClick }>
+        <div className='workspace-editor' onDragStart={ preventDefault } ref={ containerRef } style={ actualStyle } onMouseDown={ handleDrawStart } onMouseMove={ handleMouseMove } onMouseUp={ handleDrawEnd } onClick={ handleBackgroundClick }>
             {
                 drawBoxState && <DrawBox box={ drawBoxState } />
             }
             {
-                isEmpty && <Typography style={ { color: "#aaa", margin: "0 auto", fontSize: "200%" } }>Click and drag anywhere to add a new element to your workspace</Typography>
+                isEmpty && <Typography style={ { color: "#aaa", margin: "0 auto", fontSize: "200%", pointerEvents: "none" } }>Click and drag anywhere to add a new element to your workspace</Typography>
             }
             {
                 boxes.map(box =>
