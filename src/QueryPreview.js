@@ -1,5 +1,6 @@
 import React from "react";
 import DataGrid from "react-data-grid";
+import Map from "pigeon-maps";
 import createUuid from "uuid-v4";
 import { Typography } from "@material-ui/core";
 
@@ -45,10 +46,23 @@ const COLUMNS = [
     ...emptyColumns(10)
 ].map(toNamedColumn);
 
-export default function QueryPreview({ results, parameters, view, bounds }) {
+const DEFAULT_MAP_CENTER = [50.879, 4.6997];
+const DEFAULT_MAP_ZOOM = 12;
+
+export default function QueryPreview({ results, parameters, view, onViewChange, bounds }) {    
+
+    function handleMapViewChange({ center, zoom, initial }) {
+        if (!initial) {
+            onViewChange({
+                center, zoom
+            });
+        }
+    }
+
     return (
         <Typography component="div">
-            { view === "spreadsheet" && <DataGrid columns={ COLUMNS } rowGetter={ getRow } rowsCount={ 50 } minHeight={ bounds.height } enableCellSelect cellRangeSelection={{}} /> }
+            { view.type === "spreadsheet" && <DataGrid columns={ COLUMNS } rowGetter={ getRow } rowsCount={ 50 } minHeight={ bounds.height } enableCellSelect cellRangeSelection={{}} /> }
+            { view.type === "map" && <Map center={ view.center || DEFAULT_MAP_CENTER } zoom={ view.zoom || DEFAULT_MAP_ZOOM } width={ bounds.width } height={ bounds.height } onBoundsChanged={ handleMapViewChange } /> }
         </Typography>
     );
 }

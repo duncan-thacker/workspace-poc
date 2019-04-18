@@ -35,11 +35,10 @@ function ControlPanel({ onRemove, box, onChangeText, onChangeView }) {
             }
             {
                 box.type === "query" && (                    
-                    <Tabs value={ box.query.view } onChange={ (event, value) => onChangeView(value)} indicatorColor="primary" textColor="primary">
+                    <Tabs value={ box.query.view.type } onChange={ (event, value) => onChangeView({ type: value })} indicatorColor="primary" textColor="primary">
                         <Tab value="spreadsheet" label="Sheet" />
                         <Tab value="summary" label="Summary" />
                         <Tab value="map" label="Map" />
-                        <Tab value="paramaters" label="Parameters" />
                     </Tabs>
                 )
             }
@@ -195,20 +194,25 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
             query: {
                 parameters: {},
                 results: {},
-                view: "spreadsheet"
+                view: {
+                    type: "spreadsheet"
+                }
             }
         });
     }
 
-    function handleChangeView(newViewValue) {
+    function handleChangeView(changes) {
         onChange({
             ...box,
             query: {
                 ...box.query,
-                view: newViewValue
+                view: {
+                    ...box.query.view,
+                    ...changes
+                }
             }
         });
-    }
+    }    
 
     return (
         <>
@@ -218,7 +222,7 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
                         box.text && <TextEditor value={ box.text } onChange={ handleChangeText } />
                     }
                     {
-                        box.query && <QueryPreview { ...box.query } bounds={ box.bounds } />
+                        box.query && <QueryPreview { ...box.query } onChangeView={ handleChangeView } bounds={ box.bounds } />
                     }
                     {
                         isSelected && <ControlPanel box={ box } onChangeText={ handleChangeText } onChangeView={ handleChangeView } onRemove={ onRemove } />
