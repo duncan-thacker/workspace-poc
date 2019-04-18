@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
-import { Typography, AppBar, Button, Toolbar } from "@material-ui/core";
+import { Typography, AppBar, Tabs, Tab, Toolbar, Button } from "@material-ui/core";
 import { blue, cyan } from "@material-ui/core/colors";
 import { hot } from "react-hot-loader/root";
 import WorkspaceEditor from "../src/WorkspaceEditor.js";
+import createUuid from "uuid-v4";
 
 const docsTheme = createMuiTheme({
     palette: {
@@ -16,7 +17,30 @@ const docsTheme = createMuiTheme({
 });
 
 function Docs() {
-    const [ workspace, setWorkspace ] = useState({});
+    const [ workspace, setWorkspace ] = useState({
+        sections: [{ name: "Section1", id: createUuid() }]
+    });
+
+    const [ currentTabIndex, setCurrentTabIndex ] = useState(0);
+
+    function handleUpdateSection(updatedSection) {
+        const newSections = workspace.sections.map(section => {
+            return section.id === updatedSection.id ? updatedSection : section;
+        });
+        setWorkspace({
+            sections: newSections
+        });
+    }
+
+    function handleAddSection() {
+        const newSections = [...workspace.sections, { name: "Section" + (workspace.sections.length + 1), id: createUuid() }];
+        setWorkspace({
+            sections: newSections
+        });
+    }
+
+    console.log(currentTabIndex, workspace.sections);
+
     return (
         <MuiThemeProvider theme={ docsTheme }>
             <div style={ { display: "flex", flexDirection: "column", height: "100%" } }>
@@ -27,7 +51,16 @@ function Docs() {
                         </Typography>
                     </Toolbar>
                 </AppBar>
-                <WorkspaceEditor value={ workspace } onChange={ setWorkspace } style={ { flex: "1 1 0" } } />
+                <Tabs value={ currentTabIndex } onChange={ (event, value) => setCurrentTabIndex(value) }>
+                    {
+                        workspace.sections.map(section => <Tab
+                            key={ section.id }
+                            label={ section.name }
+                        />)
+                    }
+                    <Button variant="contained" onClick={ handleAddSection }>create</Button>
+                </Tabs>
+                <WorkspaceEditor value={ workspace.sections[currentTabIndex] } onChange={ handleUpdateSection } style={ { flex: "1 1 0" } } />
             </div>
         </MuiThemeProvider>
     );

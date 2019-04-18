@@ -115,7 +115,10 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
                     ...value,
                     boxes: [...oldBoxes, newBox ]
                 };
-                onSelectBox(newBox.id);
+                setTimeout(
+                    () => onSelectBox(newBox.id),
+                    100
+                ); //TODO fix - this is a hack to get around the deselection caused by the following click
                 onChange(newValue);
             }
             setDrawBoxState(undefined);
@@ -149,8 +152,14 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
     const { boxes = [] } = value;
     const isEmpty = !drawBoxState && boxes.length === 0;
 
+    function handleBackgroundClick(clickEvent) {
+        if (isEventLocal(clickEvent)) {
+            onSelectBox(undefined);
+        }
+    }
+
     return (
-        <div onDragStart={ preventDefault } ref={ containerRef } style={ actualStyle } onMouseDown={ handleDrawStart } onMouseMove={ handleMouseMove } onMouseUp={ handleDrawEnd }>
+        <div onDragStart={ preventDefault } ref={ containerRef } style={ actualStyle } onMouseDown={ handleDrawStart } onMouseMove={ handleMouseMove } onMouseUp={ handleDrawEnd } onClick={ handleBackgroundClick }>
             {
                 drawBoxState && <DrawBox box={ drawBoxState } />
             }

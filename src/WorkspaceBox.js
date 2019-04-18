@@ -31,8 +31,8 @@ function ControlPanel({ onRemove, textBeingEdited, onChangeText }) {
             {
                 textBeingEdited && <Button disabled={ !isTextHighlighted(textBeingEdited) } onClick={ handleBoldClick }>Bold</Button>
             }
-            <Button onClick={ onRemove }>remove</Button>
-            <Button className='drag-handle' style={ { cursor: "move" } }>move</Button>
+            <Button style={ { userSelect: "none" } } onClick={ onRemove }>remove</Button>
+            <Button className='drag-handle' style={ { cursor: "move", userSelect: "none" } }>move</Button>
         </Toolbar>
     );
 }
