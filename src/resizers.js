@@ -1,64 +1,64 @@
-const getBoxBottom = box => box.top + box.height;
-const getBoxRight = box => box.left + box.width;
-const getBoxHorizontalMiddle = box => box.left + (box.width / 2);
-const getBoxVerticalMiddle = box => box.top + (box.height / 2);
+const getBoundsBottom = bounds => bounds.top + bounds.height;
+const getBoundsRight = bounds => bounds.left + bounds.width;
+const getBoundsHorizontalMiddle = bounds => bounds.left + (bounds.width / 2);
+const getBoundsVerticalMiddle = bounds => bounds.top + (bounds.height / 2);
 
 export const VERTICAL_RESIZER_BOTTOM = {
-    getHandleTop: getBoxBottom,
-    getHandleElementTop: getBoxBottom,
-    getUpdatedTop: box => box.top,
-    getUpdatedHeight: (box, newHandlePosition, minimumSize) => Math.max(newHandlePosition.top - box.top, minimumSize)
+    getHandleTop: getBoundsBottom,
+    getHandleElementTop: getBoundsBottom,
+    getUpdatedTop: bounds => bounds.top,
+    getUpdatedHeight: (bounds, newHandlePosition, minimumWidth, minimumHeight) => Math.max(newHandlePosition.top - bounds.top, minimumHeight)
 };
 
 export const HORIZONTAL_RESIZER_RIGHT = {
-    getHandleLeft: getBoxRight,
-    getHandleElementLeft: getBoxRight,
-    getUpdatedLeft: box => box.left,
-    getUpdatedWidth: (box, newHandlePosition, minimumSize) => Math.max(newHandlePosition.left - box.left, minimumSize)
+    getHandleLeft: getBoundsRight,
+    getHandleElementLeft: getBoundsRight,
+    getUpdatedLeft: bounds => bounds.left,
+    getUpdatedWidth: (bounds, newHandlePosition, minimumWidth) => Math.max(newHandlePosition.left - bounds.left, minimumWidth)
 };
 
 export const VERTICAL_RESIZER_TOP = {
-    getHandleTop: box => box.top,
-    getHandleElementTop: (box, handleSizeInPixels) => box.top - handleSizeInPixels,
-    getUpdatedTop: (box, newHandlePosition, minimumSize) => {
-        const boxBottom = getBoxBottom(box);
-        const maximumTop = boxBottom - minimumSize;
+    getHandleTop: bounds => bounds.top,
+    getHandleElementTop: (bounds, handleSizeInPixels) => bounds.top - handleSizeInPixels,
+    getUpdatedTop: (bounds, newHandlePosition, minimumWidth, minimumHeight) => {
+        const boundsBottom = getBoundsBottom(bounds);
+        const maximumTop = boundsBottom - minimumHeight;
         return Math.min(newHandlePosition.top, maximumTop);
     },
-    getUpdatedHeight: (box, newHandlePosition, minimumSize) => {
-        const boxBottom = getBoxBottom(box);
-        const maximumTop = boxBottom - minimumSize;
+    getUpdatedHeight: (bounds, newHandlePosition, minimumWidth, minimumHeight) => {
+        const boundsBottom = getBoundsBottom(bounds);
+        const maximumTop = boundsBottom - minimumHeight;
         const newTop = Math.min(newHandlePosition.top, maximumTop);
-        return boxBottom - newTop;
+        return boundsBottom - newTop;
     }
 };
 
 export const HORIZONTAL_RESIZER_LEFT = {
-    getHandleLeft: box => box.left,
-    getHandleElementLeft: (box, handleSizeInPixels) => box.left - handleSizeInPixels,
-    getUpdatedLeft: (box, newHandlePosition, minimumSize) => {
-        const boxRight = getBoxRight(box);
-        const maximumLeft = boxRight - minimumSize;
+    getHandleLeft: bounds => bounds.left,
+    getHandleElementLeft: (bounds, handleSizeInPixels) => bounds.left - handleSizeInPixels,
+    getUpdatedLeft: (bounds, newHandlePosition, minimumWidth) => {
+        const boundsRight = getBoundsRight(bounds);
+        const maximumLeft = boundsRight - minimumWidth;
         return Math.min(newHandlePosition.left, maximumLeft);
     },
-    getUpdatedWidth: (box, newHandlePosition, minimumSize) => {
-        const boxRight = getBoxRight(box);
-        const maximumLeft = boxRight - minimumSize;
+    getUpdatedWidth: (bounds, newHandlePosition, minimumWidth) => {
+        const boundsRight = getBoundsRight(bounds);
+        const maximumLeft = boundsRight - minimumWidth;
         const newTop = Math.min(newHandlePosition.left, maximumLeft);
-        return boxRight - newTop;
+        return boundsRight - newTop;
     }
 };
 
 export const HORIZONTAL_RESIZER_NONE = {
-    getHandleLeft: getBoxHorizontalMiddle,
-    getHandleElementLeft: (box, handleSizeInPixels) => getBoxHorizontalMiddle(box) - (handleSizeInPixels / 2),
-    getUpdatedLeft: box => box.left,
-    getUpdatedWidth: box => box.width
+    getHandleLeft: getBoundsHorizontalMiddle,
+    getHandleElementLeft: (bounds, handleSizeInPixels) => getBoundsHorizontalMiddle(bounds) - (handleSizeInPixels / 2),
+    getUpdatedLeft: bounds => bounds.left,
+    getUpdatedWidth: bounds => bounds.width
 };
 
 export const VERTICAL_RESIZER_NONE = {
-    getHandleTop: getBoxVerticalMiddle,
-    getHandleElementTop: (box, handleSizeInPixels) => getBoxVerticalMiddle(box) - (handleSizeInPixels / 2),
-    getUpdatedTop: box => box.top,
-    getUpdatedHeight: box => box.height
+    getHandleTop: getBoundsVerticalMiddle,
+    getHandleElementTop: (bounds, handleSizeInPixels) => getBoundsVerticalMiddle(bounds) - (handleSizeInPixels / 2),
+    getUpdatedTop: bounds => bounds.top,
+    getUpdatedHeight: bounds => bounds.height
 };

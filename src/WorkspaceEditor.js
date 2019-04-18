@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { Typography } from "@material-ui/core";
 import WorkspaceBox from "./WorkspaceBox";
 import createUuid from "uuid-v4";
+import { EditorState } from "draft-js";
 
 const preventDefault = event => event.preventDefault();
 const isEventLocal = event => event.target === event.currentTarget;
@@ -99,12 +100,15 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
             const { startX, startY, endX, endY } = drawBoxState;
             const newBox = {
                 id: createUuid(),
-                left: Math.min(startX, endX),
-                top: Math.min(startY, endY),
-                width: Math.abs(startX - endX),
-                height: Math.abs(startY - endY)
+                bounds: {
+                    left: Math.min(startX, endX),
+                    top: Math.min(startY, endY),
+                    width: Math.abs(startX - endX),
+                    height: Math.abs(startY - endY)
+                },
+                text: EditorState.createEmpty()
             };
-            if (newBox.width > 50 && newBox.height > 50 ) {
+            if (newBox.bounds.width > 50 && newBox.bounds.height > 50 ) {
                 //TODO this feels like a reducer job
                 const oldBoxes = value.boxes || [];
                 const newValue = {
@@ -126,11 +130,7 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
         });
     }
 
-    function handleMoveBox(boxToMove, newPosition) {
-        const updatedBox = {
-            ...boxToMove,
-            ...newPosition
-        };
+    function handleUpdateBox(updatedBox) {
         onChange({
             ...value,
             boxes: replaceBox(value.boxes, updatedBox)
@@ -164,7 +164,7 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
                         key={ box.id }
                         onRemove={ () => handleRemoveBox(box) }
                         onSelect={ () => onSelectBox(box.id) }
-                        onChangeBounds={ newBounds => handleMoveBox(box, newBounds) }
+                        onChange={ updatedBox => handleUpdateBox(updatedBox) }
                         isSelected={ selectedBoxId === box.id }
                         containerElement={ containerRef.current }
                     />

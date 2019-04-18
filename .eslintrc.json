@@ -37,7 +37,7 @@
         "key-spacing": "error",
         "keyword-spacing": "error",
         "max-depth": ["error", { "max": 4 }],
-        "max-len": ["error", { "code": 180 }],
+        "max-len": ["warn", { "code": 180 }],
         "max-lines": ["error", { "max": 300 }],
         "max-statements": ["error", 20],
         "max-nested-callbacks": ["error", { "max": 4 }],
