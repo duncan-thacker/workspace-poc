@@ -137,10 +137,6 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
         });
     }
 
-    function handleResizeBox(boxToResize, resizeEvent) {
-        console.log(boxToResize, resizeEvent);
-    }
-
     const actualStyle = {
         ...style,
         cursor: drawBoxState ? "nwse-resize" : "default",
@@ -167,9 +163,8 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
                         box={ box }
                         key={ box.id }
                         onRemove={ () => handleRemoveBox(box) }
-                        onMove={ moveEvent => handleMoveBox(box, moveEvent ) }
                         onSelect={ () => onSelectBox(box.id) }
-                        onResize={ resizeEvent => handleResizeBox(box, resizeEvent) }
+                        onChangeBounds={ newBounds => handleMoveBox(box, newBounds) }
                         isSelected={ selectedBoxId === box.id }
                         containerElement={ containerRef.current }
                     />
