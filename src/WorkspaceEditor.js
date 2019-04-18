@@ -105,8 +105,7 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
                     top: Math.min(startY, endY),
                     width: Math.abs(startX - endX),
                     height: Math.abs(startY - endY)
-                },
-                text: EditorState.createEmpty()
+                }
             };
             if (newBox.bounds.width > 50 && newBox.bounds.height > 50 ) {
                 //TODO this feels like a reducer job

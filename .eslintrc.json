@@ -24,7 +24,7 @@
         "brace-style": "error",
         "class-methods-use-this": "error",
         "comma-spacing": "error",
-        "complexity": ["error", { "max": 8 }],
+        "complexity": ["error", { "max": 20 }],
         "curly": "error",
         "default-case": "error",
         "eol-last": "error",

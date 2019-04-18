@@ -95,6 +95,7 @@
   "dependencies": {
     "css-loader": "^2.1.1",
     "draft-js": "^0.10.5",
+    "react-data-grid": "^6.1.0",
     "react-draggable": "^3.2.1",
     "uuid-v4": "^0.1.0"
   }

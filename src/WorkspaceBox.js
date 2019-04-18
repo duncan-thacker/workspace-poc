@@ -1,9 +1,10 @@
 import React, { useRef } from "react";
-import { Toolbar, Button } from "@material-ui/core";
+import { Toolbar, Button, Tabs, Tab } from "@material-ui/core";
 import { DraggableCore } from "react-draggable";
 import { HORIZONTAL_RESIZER_LEFT, HORIZONTAL_RESIZER_RIGHT, HORIZONTAL_RESIZER_NONE, VERTICAL_RESIZER_BOTTOM, VERTICAL_RESIZER_TOP, VERTICAL_RESIZER_NONE } from "./resizers";
 import TextEditor from "./TextEditor";
-import { RichUtils } from "draft-js";
+import QueryPreview from "./QueryPreview";
+import { RichUtils, EditorState } from "draft-js";
 
 const CONTROL_PANEL_STYLE = {
     position: "absolute",
@@ -20,16 +21,27 @@ function isTextHighlighted(textState) {
     return selected.getStartOffset() !== selected.getEndOffset();
 }
 
-function ControlPanel({ onRemove, textBeingEdited, onChangeText }) {
+function ControlPanel({ onRemove, box, onChangeText, onChangeView }) {
 
+    const { text } = box;
     function handleBoldClick() {
-        onChangeText(RichUtils.toggleInlineStyle(textBeingEdited, "BOLD"));
+        onChangeText(RichUtils.toggleInlineStyle(text, "BOLD"));
     }
 
     return (
         <Toolbar style={ CONTROL_PANEL_STYLE }>
             {
-                textBeingEdited && <Button disabled={ !isTextHighlighted(textBeingEdited) } onClick={ handleBoldClick }>Bold</Button>
+                box.type === "text" && <Button disabled={ !isTextHighlighted(text) } onClick={ handleBoldClick }>Bold</Button>
+            }
+            {
+                box.type === "query" && (                    
+                    <Tabs value={ box.query.view } onChange={ (event, value) => onChangeView(value)} indicatorColor="primary" textColor="primary">
+                        <Tab value="spreadsheet" label="Sheet" />
+                        <Tab value="summary" label="Summary" />
+                        <Tab value="map" label="Map" />
+                        <Tab value="paramaters" label="Parameters" />
+                    </Tabs>
+                )
             }
             <Button style={ { userSelect: "none" } } onClick={ onRemove }>remove</Button>
             <Button className='drag-handle' style={ { cursor: "move", userSelect: "none" } }>move</Button>
@@ -168,6 +180,36 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
         });
     }
 
+    function handleSetTextBox() {
+        onChange({
+            ...box,
+            type: "text",
+            text: EditorState.createEmpty()
+        });
+    }
+
+    function handleSetQueryBox() {
+        onChange({
+            ...box,
+            type: "query",
+            query: {
+                parameters: {},
+                results: {},
+                view: "spreadsheet"
+            }
+        });
+    }
+
+    function handleChangeView(newViewValue) {
+        onChange({
+            ...box,
+            query: {
+                ...box.query,
+                view: newViewValue
+            }
+        });
+    }
+
     return (
         <>
             <DraggablePart handle=".drag-handle" relativeTo={ box.bounds } containerElement={ containerElement } onDrag={ handleChangeBounds }>
@@ -176,7 +218,18 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
                         box.text && <TextEditor value={ box.text } onChange={ handleChangeText } />
                     }
                     {
-                        isSelected && <ControlPanel textBeingEdited={ box.text } onChangeText={ handleChangeText } onRemove={ onRemove } />
+                        box.query && <QueryPreview { ...box.query } bounds={ box.bounds } />
+                    }
+                    {
+                        isSelected && <ControlPanel box={ box } onChangeText={ handleChangeText } onChangeView={ handleChangeView } onRemove={ onRemove } />
+                    }
+                    {
+                        !box.type && (
+                            <>
+                                <Button variant="contained" color="secondary" onClick={ handleSetTextBox }>Text</Button>
+                                <Button variant="contained" color="secondary" onClick={ handleSetQueryBox }>Recent Query</Button>
+                            </>
+                        )
                     }
                 </div>
             </DraggablePart>
