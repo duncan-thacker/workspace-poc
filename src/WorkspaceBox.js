@@ -5,8 +5,16 @@ import QueryPreview from "./QueryPreview";
 import DraggablePart from "./DraggablePart";
 import ResizeHandles from "./ResizeHandles";
 import PersonCard from "./PersonCard";
+import EventTimeline from "./EventTimeline";
 import { EditorState } from "draft-js";
 import ControlPanel from "./ControlPanel";
+import moment from "moment";
+
+import MusicNoteIcon from "@material-ui/icons/MusicNote";
+import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
+import DiningIcon from "@material-ui/icons/LocalDining";
+import GasStationIcon from "@material-ui/icons/LocalGasStation";
+import BedIcon from "@material-ui/icons/LocalHotel";
 
 export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSelected, containerElement }) {
     //TODO fix box overflow by clipping
@@ -103,6 +111,50 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
         });
     }
 
+    function handleSetTimeline() {
+        onChange( {
+            ...box,
+            type: "timeline",
+            timeline: [
+                {
+                    when: moment().subtract(2513, "minutes"),
+                    Icon: MusicNoteIcon,
+                    what: "Winifred sang a song"
+                },
+                {
+                    when: moment().subtract(2123, "minutes"),
+                    Icon: DiningIcon,
+                    what: "Bob had some dinner"
+                },
+                {
+                    when: moment().subtract(1889, "minutes"),
+                    Icon: PhotoCameraIcon,
+                    what: "Bob took a photo"
+                },
+                {
+                    when: moment().subtract(1639, "minutes"),
+                    Icon: PhotoCameraIcon,
+                    what: "Winifred took a photo"
+                },
+                {
+                    when: moment().subtract(1219, "minutes"),
+                    Icon: GasStationIcon,
+                    what: "Bob got some petrol"
+                },
+                {
+                    when: moment().subtract(839, "minutes"),
+                    Icon: PhotoCameraIcon,
+                    what: "Bob took a photo"
+                },
+                {
+                    when: moment().subtract(339, "minutes"),
+                    Icon: BedIcon,
+                    what: "Bob went to sleep"
+                }
+            ]
+        });
+    }
+
     return (
         <>
             <DraggablePart handle=".drag-handle" relativeTo={ box.bounds } containerElement={ containerElement } onDrag={ handleChangeBounds }>
@@ -117,6 +169,9 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
                         box.card && <PersonCard bound={ box.bounds } card={ box.card } />
                     }
                     {
+                        box.timeline && <EventTimeline bound={ box.bounds } timeline={ box.timeline } />
+                    }
+                    {
                         isSelected && <ControlPanel box={ box } onChangeText={ handleChangeText } onChangeView={ handleChangeView } onRemove={ onRemove } />
                     }
                     {
@@ -125,6 +180,7 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
                                 <Button variant="contained" color="secondary" onClick={ handleSetTextBox }>Text</Button>
                                 <Button variant="contained" color="secondary" onClick={ handleSetQueryBox }>Recent Query</Button>
                                 <Button variant="contained" color="secondary" onClick={ handleSetPersonCard }>Person Card</Button>
+                                <Button variant="contained" color="secondary" onClick={ handleSetTimeline }>Timeline</Button>
                             </>
                         )
                     }

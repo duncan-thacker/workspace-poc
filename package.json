@@ -96,10 +96,12 @@
     "@material-ui/icons": "^3.0.2",
     "css-loader": "^2.1.1",
     "draft-js": "^0.10.5",
+    "moment": "^2.24.0",
     "pigeon-maps": "^0.12.1",
     "pigeon-marker": "^0.3.4",
     "react-data-grid": "^6.1.0",
     "react-draggable": "^3.2.1",
+    "react-event-timeline": "^1.6.3",
     "uuid-v4": "^0.1.0"
   }
 }
