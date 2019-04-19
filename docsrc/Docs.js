@@ -49,7 +49,7 @@ function Docs() {
                         </Typography>
                     </Toolbar>
                 </AppBar>
-                <Tabs value={ currentTabIndex } onChange={ (event, value) => setCurrentTabIndex(value) }>
+                <Tabs value={ currentTabIndex } onChange={ (event, value) => setCurrentTabIndex(value) } style={ { boxShadow: "0px 2px 8px rgba(0,0,0,0.5)" } }>
                     {
                         workspace.sections.map(section => <Tab
                             key={ section.id }

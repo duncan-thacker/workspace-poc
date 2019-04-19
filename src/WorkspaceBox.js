@@ -26,6 +26,11 @@ function isTextHighlighted(textState) {
     return selected.getStartOffset() !== selected.getEndOffset();
 }
 
+
+const MINI_TAB_STYLE ={
+    minWidth: 80
+};
+
 function ControlPanel({ onRemove, box, onChangeText, onChangeView }) {
 
     const { text } = box;
@@ -41,9 +46,9 @@ function ControlPanel({ onRemove, box, onChangeText, onChangeView }) {
             {
                 box.type === "query" && (
                     <Tabs value={ box.query.view.type } onChange={ (event, value) => onChangeView({ type: value })} indicatorColor="primary" textColor="primary">
-                        <Tab value="spreadsheet" label={ <GridOnIcon /> } />
-                        <Tab value="summary" label={ <BarChartIcon /> } />
-                        <Tab value="map" label={ <PlaceIcon /> } />
+                        <Tab style={ MINI_TAB_STYLE } value="spreadsheet" label={ <GridOnIcon /> } />
+                        <Tab style={ MINI_TAB_STYLE } value="summary" label={ <BarChartIcon /> } />
+                        <Tab style={ MINI_TAB_STYLE } value="map" label={ <PlaceIcon /> } />
                     </Tabs>
                 )
             }
