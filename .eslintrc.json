@@ -31,7 +31,6 @@
         "eqeqeq": "error",
         "func-call-spacing": "error",
         "func-names": "error",
-        "id-blacklist": ["error", "data", "val", "obj", "function", "arg", "that", "err", "callback"],
         "id-length": ["error", { "min": 3, "exceptions": ["id"] }],
         "indent": ["error", 4],
         "key-spacing": "error",

@@ -8,15 +8,12 @@ import PersonCard from "./PersonCard";
 import EventTimeline from "./EventTimeline";
 import { EditorState } from "draft-js";
 import ControlPanel from "./ControlPanel";
-import moment from "moment";
 
-import MusicNoteIcon from "@material-ui/icons/MusicNote";
-import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
-import DiningIcon from "@material-ui/icons/LocalDining";
-import GasStationIcon from "@material-ui/icons/LocalGasStation";
-import BedIcon from "@material-ui/icons/LocalHotel";
+const onChange = () => {
+    window.alert("not implemented"); 
+};
 
-export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSelected, containerElement }) {
+export default function WorkspaceBox({ box, dispatch, onSelect, isSelected, containerElement }) {
     //TODO fix box overflow by clipping
     const { top, left, width, height } = box.bounds;
     const style = {
@@ -33,6 +30,13 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
         zIndex: isSelected ? 300 : 0
     };
 
+    function handleRemoveBox() {
+        dispatch({
+            type: "REMOVE_BOX",
+            boxIdToRemove: box.id
+        });
+    }
+
     function handleChangeText(newText, editorHeight) {
         const newBounds = editorHeight > box.bounds.height ? { ...box.bounds, height: editorHeight } : box.bounds;
         onChange({
@@ -44,9 +48,18 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
     }
 
     function handleChangeBounds(newBounds) {
-        onChange({
-            ...box,
-            bounds: { ...box.bounds, ...newBounds }
+        dispatch({
+            type: "UPDATE_BOX_BOUNDS",
+            bounds: newBounds,
+            boxIdToUpdate: box.id
+        });
+    }
+
+    function handleSetBoxContents(contents) {
+        dispatch({
+            type: "UPDATE_BOX_CONTENTS",
+            boxIdToUpdate: box.id,
+            contents
         });
     }
 
@@ -59,8 +72,7 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
     }
 
     function handleSetQueryBox() {
-        onChange({
-            ...box,
+        handleSetBoxContents({
             type: "query",
             query: {
                 parameters: {},
@@ -72,33 +84,27 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
         });
     }
 
-    function handleChangeView(changes) {
+    function handleChangeView(newView) {
         if (box.query) {
-            onChange({
-                ...box,
-                query: {
-                    ...box.query,
-                    view: {
-                        ...box.query.view,
-                        ...changes
-                    }
-                }
+            dispatch({
+                type: "UPDATE_BOX_VIEW",
+                boxIdToUpdate: box.id,
+                field: "query",
+                view: newView
             });
         }
         if (box.card) {
-            onChange({
-                ...box,
-                card: {
-                    ...box.card,
-                    view: changes.type
-                }
+            dispatch({
+                type: "UPDATE_BOX_VIEW",
+                boxIdToUpdate: box.id,
+                field: "card",
+                view: newView
             });
         }
     }
 
     function handleSetPersonCard() {
-        onChange({
-            ...box,
+        handleSetBoxContents({
             type: "card",
             card: {
                 title: "Winifred Skillets",
@@ -106,49 +112,50 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
                 description: "Friendly person with many interesting skills including jazz trombone, windsurfing, and speed chess.",
                 location: [ 52.076, -0.42 ],
                 image: "https://upload.wikimedia.org/wikipedia/en/f/f4/Winifred_Atwell.jpg",
-                view: "image"
+                view: {
+                    type: "image"
+                }
             }
         });
     }
 
     function handleSetTimeline() {
-        onChange( {
-            ...box,
+        handleSetBoxContents({
             type: "timeline",
             timeline: [
                 {
-                    when: moment().subtract(2513, "minutes"),
-                    Icon: MusicNoteIcon,
+                    when: 2513,
+                    icon: "song",
                     what: "Winifred sang a song"
                 },
                 {
-                    when: moment().subtract(2123, "minutes"),
-                    Icon: DiningIcon,
+                    when: 2123,
+                    icon: "food",
                     what: "Bob had some dinner"
                 },
                 {
-                    when: moment().subtract(1889, "minutes"),
-                    Icon: PhotoCameraIcon,
+                    when: 1889,
+                    icon: "photo",
                     what: "Bob took a photo"
                 },
                 {
-                    when: moment().subtract(1639, "minutes"),
-                    Icon: PhotoCameraIcon,
+                    when: 1639,
+                    icon: "photo",
                     what: "Winifred took a photo"
                 },
                 {
-                    when: moment().subtract(1219, "minutes"),
-                    Icon: GasStationIcon,
+                    when: 1219,
+                    icon: "petrol",
                     what: "Bob got some petrol"
                 },
                 {
-                    when: moment().subtract(839, "minutes"),
-                    Icon: PhotoCameraIcon,
+                    when: 839,
+                    icon: "photo",
                     what: "Bob took a photo"
                 },
                 {
-                    when: moment().subtract(339, "minutes"),
-                    Icon: BedIcon,
+                    when: 339,
+                    icon: "sleep",
                     what: "Bob went to sleep"
                 }
             ]
@@ -172,7 +179,7 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
                         box.timeline && <EventTimeline bound={ box.bounds } timeline={ box.timeline } />
                     }
                     {
-                        isSelected && <ControlPanel box={ box } onChangeText={ handleChangeText } onChangeView={ handleChangeView } onRemove={ onRemove } />
+                        isSelected && <ControlPanel box={ box } onChangeText={ handleChangeText } onChangeView={ handleChangeView } onRemove={ handleRemoveBox } />
                     }
                     {
                         !box.type && (

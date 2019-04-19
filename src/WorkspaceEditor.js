@@ -59,13 +59,7 @@ function DrawBox( { box } ) {
     return <div style={ style } />;
 }
 
-function replaceBox(boxes = [], newBox) {
-    return boxes.map(box => {
-        return box.id === newBox.id ? newBox : box;
-    });
-}
-
-function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
+function Workspace({ style, value, dispatch, selectedBoxId, onSelectBox }) {
 
     const [ drawBoxState, setDrawBoxState ] = useState(undefined);
     const containerRef = useRef(null);
@@ -107,35 +101,17 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
                 }
             };
             if (newBox.bounds.width > 50 && newBox.bounds.height > 50 ) {
-                //TODO this feels like a reducer job
-                const oldBoxes = value.boxes || [];
-                const newValue = {
-                    ...value,
-                    boxes: [...oldBoxes, newBox ]
-                };
                 setTimeout(
                     () => onSelectBox(newBox.id),
                     100
                 ); //TODO fix - this is a hack to get around the deselection caused by the following click
-                onChange(newValue);
+                dispatch({
+                    type: "ADD_BOX",
+                    boxToAdd: newBox
+                });
             }
             setDrawBoxState(undefined);
         }
-    }
-
-    function handleRemoveBox(boxToRemove) {
-        const oldBoxes = value.boxes || [];
-        onChange({
-            ...value,
-            boxes: oldBoxes.filter(box => box.id !== boxToRemove.id)
-        });
-    }
-
-    function handleUpdateBox(updatedBox) {
-        onChange({
-            ...value,
-            boxes: replaceBox(value.boxes, updatedBox)
-        });
     }
 
     const actualStyle = {
@@ -169,9 +145,8 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
                     <WorkspaceBox
                         box={ box }
                         key={ box.id }
-                        onRemove={ () => handleRemoveBox(box) }
                         onSelect={ () => onSelectBox(box.id) }
-                        onChange={ updatedBox => handleUpdateBox(updatedBox) }
+                        dispatch={ dispatch }
                         isSelected={ selectedBoxId === box.id }
                         containerElement={ containerRef.current }
                     />
@@ -181,7 +156,7 @@ function Workspace({ style, value, onChange, selectedBoxId, onSelectBox }) {
     );
 }
 
-export default function WorkspaceEditor({ value, onChange, style, }) {
+export default function WorkspaceEditor({ value, dispatch, style, }) {
     const bigStyle = { ...style, display: "flex", flexDirection: "column" };
     const [ selectedBoxId, setSelectedBoxId ] = useState(undefined);
     return (
@@ -189,7 +164,7 @@ export default function WorkspaceEditor({ value, onChange, style, }) {
             <WorkspaceToolbar />
             <Workspace
                 value={ value }
-                onChange={ onChange }
+                dispatch={ dispatch }
                 onSelectBox={ setSelectedBoxId }
                 style={ { flex: "1 1 0" } }
                 selectedBoxId={ selectedBoxId }

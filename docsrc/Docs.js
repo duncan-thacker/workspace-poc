@@ -4,7 +4,9 @@ import { Typography, AppBar, Tabs, Tab, Toolbar, Button } from "@material-ui/cor
 import { blue, cyan } from "@material-ui/core/colors";
 import { hot } from "react-hot-loader/root";
 import WorkspaceEditor from "../src/WorkspaceEditor.js";
+import useSharedReducer from "./useSharedReducer";
 import createUuid from "uuid-v4";
+import workspaceReducer from "./workspaceReducer";
 
 const docsTheme = createMuiTheme({
     palette: {
@@ -16,26 +18,27 @@ const docsTheme = createMuiTheme({
     }
 });
 
+const initialWorkspaceState = { sections: [{ name: "Section1", id: "section1" }] };
+
 function Docs() {
-    const [ workspace, setWorkspace ] = useState({
-        sections: [{ name: "Section1", id: createUuid() }]
-    });
+
+    const [ workspace, dispatch ] = useSharedReducer("workspaceComms", workspaceReducer, initialWorkspaceState);
 
     const [ currentTabIndex, setCurrentTabIndex ] = useState(0);
 
-    function handleUpdateSection(updatedSection) {
-        const newSections = workspace.sections.map(section => {
-            return section.id === updatedSection.id ? updatedSection : section;
-        });
-        setWorkspace({
-            sections: newSections
+    function handleAddSection() {
+        dispatch({
+            type: "ADD_NEW_SECTION",
+            id: createUuid(),
+            name: "New section"
         });
     }
 
-    function handleAddSection() {
-        const newSections = [...workspace.sections, { name: "Section" + (workspace.sections.length + 1), id: createUuid() }];
-        setWorkspace({
-            sections: newSections
+    const sectionId = workspace.sections[currentTabIndex].id;
+    function handleSectionDispatch(action) {
+        dispatch({
+            ...action,
+            sectionId
         });
     }
 
@@ -45,7 +48,7 @@ function Docs() {
                 <AppBar position="static">
                     <Toolbar>
                         <Typography variant="h4" color="inherit">
-                        Workspaces
+                            Workspaces
                         </Typography>
                     </Toolbar>
                 </AppBar>
@@ -58,7 +61,7 @@ function Docs() {
                     }
                     <Button variant="contained" onClick={ handleAddSection }>create</Button>
                 </Tabs>
-                <WorkspaceEditor value={ workspace.sections[currentTabIndex] } onChange={ handleUpdateSection } style={ { flex: "1 1 0" } } />
+                <WorkspaceEditor value={ workspace.sections[currentTabIndex] } dispatch={ handleSectionDispatch } style={ { flex: "1 1 0" } } />
             </div>
         </MuiThemeProvider>
     );

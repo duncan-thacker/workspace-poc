@@ -6,10 +6,10 @@ export default function PersonCard({ card }) {
     return (
         <Card style={ { height: "100%", display: "flex", flexDirection: "column" } }>
             {
-                card.view === "image" && <CardMedia image={ card.image } title={ `Picture of ${card.title}` } style={ { height: 120 } } />
+                card.view.type === "image" && <CardMedia image={ card.image } title={ `Picture of ${card.title}` } style={ { height: 120 } } />
             }
             {
-                card.view === "map" && <DataMap rows={ [card] } center={ card.location } zoom={ 11 } height={ 120 } />
+                card.view.type === "map" && <DataMap rows={ [card] } center={ card.location } zoom={ 11 } height={ 120 } />
             }
             <CardContent>
                 <Typography variant="h5" gutterBottom>{ card.title }</Typography>
