@@ -18,11 +18,25 @@ const docsTheme = createMuiTheme({
     }
 });
 
+function usersReducer(users, action) {
+    if (action.type === "USER_SELECT_BOX") {
+        return {
+            ...users,
+            [action.userId]: {
+                selectedBoxId: action.selectedBoxId
+            }
+        };
+    }
+    throw new Error("Unrecognised action type " + action.type);
+}
+
 const initialWorkspaceState = { sections: [{ name: "Section1", id: "section1" }] };
 
 function Docs() {
 
     const [ workspace, dispatch ] = useSharedReducer("workspaceComms", workspaceReducer, initialWorkspaceState);
+
+    const [ users, dispatchUsers ] = useSharedReducer("userComms", usersReducer, {});
 
     const [ currentTabIndex, setCurrentTabIndex ] = useState(0);
 
@@ -61,7 +75,7 @@ function Docs() {
                     }
                     <Button variant="contained" onClick={ handleAddSection }>create</Button>
                 </Tabs>
-                <WorkspaceEditor value={ workspace.sections[currentTabIndex] } dispatch={ handleSectionDispatch } style={ { flex: "1 1 0" } } />
+                <WorkspaceEditor value={ workspace.sections[currentTabIndex] } dispatch={ handleSectionDispatch } users={ users } dispatchUsers={ dispatchUsers } style={ { flex: "1 1 0" } } />
             </div>
         </MuiThemeProvider>
     );

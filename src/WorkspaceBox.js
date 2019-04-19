@@ -1,19 +1,55 @@
 import React from "react";
-import { Button } from "@material-ui/core";
+import { Button, Typography } from "@material-ui/core";
 import TextEditor from "./TextEditor";
 import QueryPreview from "./QueryPreview";
 import DraggablePart from "./DraggablePart";
 import ResizeHandles from "./ResizeHandles";
 import PersonCard from "./PersonCard";
 import EventTimeline from "./EventTimeline";
-import { EditorState } from "draft-js";
 import ControlPanel from "./ControlPanel";
 
 const onChange = () => {
-    window.alert("not implemented"); 
+    window.alert("not implemented");
 };
 
-export default function WorkspaceBox({ box, dispatch, onSelect, isSelected, containerElement }) {
+function prFrom(array, seed) {
+    return array[seed % array.length];
+}
+
+const FIRST_NAMES = ["Jacob", "Stephanie", "Boris", "Hugh", "Scott", "Maisy", "Donald", "Jeremy", "Thomas", "Percy", "Henry", "Mavis", "Rose", "Caitlin", "Spencer"];
+const LAST_NAMES = ["Porter", "Cullen", "Edwards", "Roberts", "Smith", "Snow", "Stark", "Sixsmith", "Clark", "Winsfield", "Davies", "Masterson"];
+
+function getUserName(userId) {
+    const userIdNumber = parseInt(userId.replace(/-/g, ""), 16);
+    return prFrom(FIRST_NAMES, Math.floor(userIdNumber/10000)) + " " + prFrom(LAST_NAMES, userIdNumber);
+}
+
+function OtherUserSelection({ userId, boxBounds }) {
+    const { top, width, left, height } = boxBounds;
+    const style = {
+        position: "absolute",
+        top: top + height,
+        width: width + 3,
+        left,
+        pointerEvents: "none",
+        display: "flex"
+    };
+    const tabStyle = {
+        color: "#fff",
+        marginLeft: "auto",
+        backgroundColor: "#5c5",
+        borderRadius: 4,
+        pointerEvents: "default",
+        padding: "2px 16px"
+    };
+    return (
+        <div style={ style }>
+            <Typography style={ tabStyle }>{ getUserName(userId) }</Typography>
+        </div>
+    );
+}
+
+export default function WorkspaceBox({ box, dispatch, onSelect, isSelected, containerElement, otherSelectors }) {
     //TODO fix box overflow by clipping
     const { top, left, width, height } = box.bounds;
     const style = {
@@ -29,6 +65,10 @@ export default function WorkspaceBox({ box, dispatch, onSelect, isSelected, cont
         boxShadow: isSelected ? "3px 3px 3px rgba(0,0,0,0.6)" : "none",
         zIndex: isSelected ? 300 : 0
     };
+
+    if (otherSelectors.length === 1) {
+        style.outline = "3px solid #5c5";
+    }
 
     function handleRemoveBox() {
         dispatch({
@@ -65,9 +105,8 @@ export default function WorkspaceBox({ box, dispatch, onSelect, isSelected, cont
 
     function handleSetTextBox() {
         onChange({
-            ...box,
             type: "text",
-            text: EditorState.createEmpty()
+            textBlocks: []
         });
     }
 
@@ -167,7 +206,7 @@ export default function WorkspaceBox({ box, dispatch, onSelect, isSelected, cont
             <DraggablePart handle=".drag-handle" relativeTo={ box.bounds } containerElement={ containerElement } onDrag={ handleChangeBounds }>
                 <div style={ style } onClick={ onSelect }>
                     {
-                        box.text && <TextEditor value={ box.text } onChange={ handleChangeText } />
+                        box.textBlocks && <TextEditor value={ box.textBlocks } onChange={ handleChangeText } />
                     }
                     {
                         box.query && <QueryPreview { ...box.query } onChangeView={ handleChangeView } bounds={ box.bounds } />
@@ -195,6 +234,9 @@ export default function WorkspaceBox({ box, dispatch, onSelect, isSelected, cont
             </DraggablePart>
             {
                 isSelected && <ResizeHandles minHeight={ box.minHeight } boxBounds={ box.bounds } onResize={ handleChangeBounds } containerElement={ containerElement } />
+            }
+            {
+                otherSelectors.length === 1 && <OtherUserSelection userId={ otherSelectors[0] } boxBounds={ box.bounds } />
             }
         </>
     );

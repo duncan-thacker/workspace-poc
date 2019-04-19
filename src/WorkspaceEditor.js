@@ -39,10 +39,6 @@ function respectMinimumSize(position, { startX, startY }, minimumSize) {
     };
 }
 
-function WorkspaceToolbar() {
-    return false;
-}
-
 function DrawBox( { box } ) {
     //TODO fix box overflow by clipping
     const { startX, startY, endX, endY } = box;
@@ -59,7 +55,9 @@ function DrawBox( { box } ) {
     return <div style={ style } />;
 }
 
-function Workspace({ style, value, dispatch, selectedBoxId, onSelectBox }) {
+const USER_ID = createUuid();
+
+function Workspace({ style, value, dispatch, users, dispatchUsers }) {
 
     const [ drawBoxState, setDrawBoxState ] = useState(undefined);
     const containerRef = useRef(null);
@@ -88,6 +86,14 @@ function Workspace({ style, value, dispatch, selectedBoxId, onSelectBox }) {
         }
     }
 
+    function handleSelectBox(boxId) {
+        dispatchUsers({
+            type: "USER_SELECT_BOX",
+            userId: USER_ID,
+            selectedBoxId: boxId
+        });
+    }
+
     function handleDrawEnd() {
         if (drawBoxState) {
             const { startX, startY, endX, endY } = drawBoxState;
@@ -102,7 +108,7 @@ function Workspace({ style, value, dispatch, selectedBoxId, onSelectBox }) {
             };
             if (newBox.bounds.width > 50 && newBox.bounds.height > 50 ) {
                 setTimeout(
-                    () => onSelectBox(newBox.id),
+                    () => handleSelectBox(newBox.id),
                     100
                 ); //TODO fix - this is a hack to get around the deselection caused by the following click
                 dispatch({
@@ -128,9 +134,11 @@ function Workspace({ style, value, dispatch, selectedBoxId, onSelectBox }) {
 
     function handleBackgroundClick(clickEvent) {
         if (isEventLocal(clickEvent)) {
-            onSelectBox(undefined);
+            handleSelectBox(undefined);
         }
     }
+
+    const currentUserSelectedBoxId = users[USER_ID] && users[USER_ID].selectedBoxId;
 
     return (
         <div className='workspace-editor' onDragStart={ preventDefault } ref={ containerRef } style={ actualStyle } onMouseDown={ handleDrawStart } onMouseMove={ handleMouseMove } onMouseUp={ handleDrawEnd } onClick={ handleBackgroundClick }>
@@ -145,9 +153,10 @@ function Workspace({ style, value, dispatch, selectedBoxId, onSelectBox }) {
                     <WorkspaceBox
                         box={ box }
                         key={ box.id }
-                        onSelect={ () => onSelectBox(box.id) }
+                        onSelect={ () => handleSelectBox(box.id) }
                         dispatch={ dispatch }
-                        isSelected={ selectedBoxId === box.id }
+                        isSelected={ currentUserSelectedBoxId === box.id }
+                        otherSelectors={ Object.keys(users).filter(userId => userId !== USER_ID && users[userId].selectedBoxId === box.id) }
                         containerElement={ containerRef.current }
                     />
                 )
@@ -156,18 +165,16 @@ function Workspace({ style, value, dispatch, selectedBoxId, onSelectBox }) {
     );
 }
 
-export default function WorkspaceEditor({ value, dispatch, style, }) {
+export default function WorkspaceEditor({ value, dispatch, style, users, dispatchUsers }) {
     const bigStyle = { ...style, display: "flex", flexDirection: "column" };
-    const [ selectedBoxId, setSelectedBoxId ] = useState(undefined);
     return (
         <div style={ bigStyle }>
-            <WorkspaceToolbar />
             <Workspace
                 value={ value }
                 dispatch={ dispatch }
-                onSelectBox={ setSelectedBoxId }
+                users={ users }
+                dispatchUsers={ dispatchUsers }
                 style={ { flex: "1 1 0" } }
-                selectedBoxId={ selectedBoxId }
             />
         </div>
     );
