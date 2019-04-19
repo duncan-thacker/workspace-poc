@@ -6,6 +6,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import GridOnIcon from "@material-ui/icons/GridOn";
 import PlaceIcon from "@material-ui/icons/Place";
 import BarChartIcon from "@material-ui/icons/BarChart";
+import ImageIcon from "@material-ui/icons/Image";
 
 const CONTROL_PANEL_STYLE = {
     position: "absolute",
@@ -21,7 +22,6 @@ function isTextHighlighted(textState) {
     const selected = textState.getSelection();
     return selected.getStartOffset() !== selected.getEndOffset();
 }
-
 
 const MINI_TAB_STYLE ={
     minWidth: 80
@@ -44,6 +44,14 @@ export default function ControlPanel({ onRemove, box, onChangeText, onChangeView
                     <Tabs value={ box.query.view.type } onChange={ (event, value) => onChangeView({ type: value })} indicatorColor="primary" textColor="primary">
                         <Tab style={ MINI_TAB_STYLE } value="spreadsheet" label={ <GridOnIcon /> } />
                         <Tab style={ MINI_TAB_STYLE } value="summary" label={ <BarChartIcon /> } />
+                        <Tab style={ MINI_TAB_STYLE } value="map" label={ <PlaceIcon /> } />
+                    </Tabs>
+                )
+            }
+            {
+                box.type === "card" && (
+                    <Tabs value={ box.card.view } onChange={ (event, value) => onChangeView({ type: value })} indicatorColor="primary" textColor="primary">
+                        <Tab style={ MINI_TAB_STYLE } value="image" label={ <ImageIcon /> } />
                         <Tab style={ MINI_TAB_STYLE } value="map" label={ <PlaceIcon /> } />
                     </Tabs>
                 )

@@ -4,6 +4,7 @@ import TextEditor from "./TextEditor";
 import QueryPreview from "./QueryPreview";
 import DraggablePart from "./DraggablePart";
 import ResizeHandles from "./ResizeHandles";
+import PersonCard from "./PersonCard";
 import { EditorState } from "draft-js";
 import ControlPanel from "./ControlPanel";
 
@@ -64,14 +65,40 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
     }
 
     function handleChangeView(changes) {
+        if (box.query) {
+            onChange({
+                ...box,
+                query: {
+                    ...box.query,
+                    view: {
+                        ...box.query.view,
+                        ...changes
+                    }
+                }
+            });
+        }
+        if (box.card) {
+            onChange({
+                ...box,
+                card: {
+                    ...box.card,
+                    view: changes.type
+                }
+            });
+        }
+    }
+
+    function handleSetPersonCard() {
         onChange({
             ...box,
-            query: {
-                ...box.query,
-                view: {
-                    ...box.query.view,
-                    ...changes
-                }
+            type: "card",
+            card: {
+                title: "Winifred Skillets",
+                bioSummary: "61-year-old female German national",
+                description: "Friendly person with many interesting skills including jazz trombone, windsurfing, and speed chess.",
+                location: [ 52.076, -0.42 ],
+                image: "https://upload.wikimedia.org/wikipedia/en/f/f4/Winifred_Atwell.jpg",
+                view: "image"
             }
         });
     }
@@ -87,6 +114,9 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
                         box.query && <QueryPreview { ...box.query } onChangeView={ handleChangeView } bounds={ box.bounds } />
                     }
                     {
+                        box.card && <PersonCard bound={ box.bounds } card={ box.card } />
+                    }
+                    {
                         isSelected && <ControlPanel box={ box } onChangeText={ handleChangeText } onChangeView={ handleChangeView } onRemove={ onRemove } />
                     }
                     {
@@ -94,6 +124,7 @@ export default function WorkspaceBox({ box, onRemove, onChange, onSelect, isSele
                             <>
                                 <Button variant="contained" color="secondary" onClick={ handleSetTextBox }>Text</Button>
                                 <Button variant="contained" color="secondary" onClick={ handleSetQueryBox }>Recent Query</Button>
+                                <Button variant="contained" color="secondary" onClick={ handleSetPersonCard }>Person Card</Button>
                             </>
                         )
                     }

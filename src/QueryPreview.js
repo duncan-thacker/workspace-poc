@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DataGrid from "react-data-grid";
-import Map from "pigeon-maps";
-import Marker from "pigeon-marker";
+import DataMap from "./DataMap";
 import createUuid from "uuid-v4";
 import { Typography, TextField, MenuItem } from "@material-ui/core";
 
@@ -98,7 +97,6 @@ function byCount(summary1, summary2) {
     return summary2.count - summary1.count;
 }
 
-
 function Summary({ rows, field = "color", onSummaryFieldChange, numberOfBars = 11 }) {
     const summaries = rows.reduce(summariseByField(field), []).sort(byCount).slice(0, numberOfBars);
     const maxCount = summaries[0].count;
@@ -117,18 +115,6 @@ function Summary({ rows, field = "color", onSummaryFieldChange, numberOfBars = 1
     );
 }
 
-function DataMap({ rows, width, ...props }) {
-    const firstRender = useFirstRender();
-    const actualWidth = firstRender ? undefined : width; //workaround weird pigeon issue
-    return (
-        <Map {...props} width={ actualWidth }>
-            {
-                rows.map(row => <Marker key={ row.id } anchor={ row.location } />)
-            }
-        </Map>
-    );
-}
-
 export default function QueryPreview({ view, onChangeView, bounds }) {
 
     function handleMapViewChange({ center, zoom, initial }) {
@@ -143,7 +129,7 @@ export default function QueryPreview({ view, onChangeView, bounds }) {
         onChangeView({
             field: newSummaryField
         });
-    }    
+    }
 
     return (
         <Typography component="div">
